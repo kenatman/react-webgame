@@ -7,35 +7,54 @@
     <body>
         <div id="root"></div> <!-- 결과 : <div id="root"><button>Like</button></div> -->
         <script type="text/babel">
-            class LikeButton extends React.Component {
+            class GuGuDan extends React.Component {
                 constructor(props) {
                     super(props);
                     this.state = {
-                        liked: false,
+                        first: Math.ceil(Math.random()*9),
+                        second: Math.ceil(Math.random()*9),
+                        value: "",
+                        result: "",
                     }
                 }
 
-                render() {
-                    return (<button type='submit' onClick={() => {
-                        this.setState({liked: true})
-                    }}>{this.state.liked ? 'Liked' : 'Like'}</button>)
-                    // JSX(JS + XML)
+                handleSubmit = (e) => {
+                    e.preventDefault();
+                    if(parseInt(this.state.value) === this.state.first * this.state.second){
+                        this.setState({
+                            first: Math.ceil(Math.random()*9),
+                            second: Math.ceil(Math.random()*9),
+                            value: "",
+                            result: "정답",
+                        })
+                    } else{
+                        this.setState({
+                            value: "",
+                            result: "떙!",
+                        })
+                    }
+                }
 
-                    /* e('button',
-                        {
-                            onClick: () => {
-                                this.setState({liked: true})
-                            }, type: 'submit'
-                        },
-                        this.state.liked ? 'Liked' : 'Like');*/
-                    // <button>Like</button>을 만들겠다.
-                    // 2번째 자리 : HTML속성을 넣는 자리(객체형식으로 표현)
-                    // <button onclick="() => { console.log('clicked!') }" type="submit">Like</button>
+                handleChange = (e) => {this.setState({value: e.target.value})}
+
+                render() {
+                    return (
+                        <div>
+                            <div>{this.state.first} 곱하기 {this.state.second}는?</div>
+                            <form onSubmit={this.handleSubmit}>
+                                <input type="number" value={this.state.value} onChange={this.handleChange}/>
+                                <button>입력</button>
+                            </form>
+                            <div>
+                                {this.state.result}
+                            </div>
+                        </div>
+                    )
                 }
             }
         </script>
         <script type="text/babel">
-            ReactDOM.render(<LikeButton />, document.querySelector('#root'));
+            ReactDOM.render(<GuGuDan />, document.querySelector('#root'));
         </script>
     </body>
 </html>
