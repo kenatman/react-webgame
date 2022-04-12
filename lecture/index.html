@@ -2,12 +2,11 @@
     <head>
         <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
         <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     </head>
     <body>
         <div id="root"></div> <!-- 결과 : <div id="root"><button>Like</button></div> -->
-        <script>
-            const e  = React.createElement;
-
+        <script type="text/babel">
             class LikeButton extends React.Component {
                 constructor(props) {
                     super(props);
@@ -17,21 +16,26 @@
                 }
 
                 render() {
-                    return e('button',
+                    return (<button type='submit' onClick={() => {
+                        this.setState({liked: true})
+                    }}>{this.state.liked ? 'Liked' : 'Like'}</button>)
+                    // JSX(JS + XML)
+
+                    /* e('button',
                         {
                             onClick: () => {
                                 this.setState({liked: true})
                             }, type: 'submit'
                         },
-                        this.state.liked ? 'Liked' : 'Like');
+                        this.state.liked ? 'Liked' : 'Like');*/
                     // <button>Like</button>을 만들겠다.
                     // 2번째 자리 : HTML속성을 넣는 자리(객체형식으로 표현)
                     // <button onclick="() => { console.log('clicked!') }" type="submit">Like</button>
                 }
             }
         </script>
-        <script>
-            ReactDOM.render(e(LikeButton), document.querySelector('#root'));
+        <script type="text/babel">
+            ReactDOM.render(<LikeButton />, document.querySelector('#root'));
         </script>
     </body>
 </html>
