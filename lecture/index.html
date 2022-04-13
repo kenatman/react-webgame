@@ -26,7 +26,8 @@
                             second: Math.ceil(Math.random() * 9),
                             value: "",
                             result: "정답: " + prev.value,
-                        }))
+                        }));
+                        this.input.focus();
                     } else{
                         this.setState({
                             value: "",
@@ -37,12 +38,20 @@
 
                 handleChange = (e) => {this.setState({value: e.target.value})}
 
+                input;
+
+                handleRefInput = (c) => {this.input = c}
+
                 render() {
                     return (
                         <div>
                             <div>{this.state.first} 곱하기 {this.state.second}는?</div>
                             <form onSubmit={this.handleSubmit}>
-                                <input type="number" value={this.state.value} onChange={this.handleChange}/>
+                                <input
+                                    ref={this.handleRefInput}
+                                    type="number"
+                                    value={this.state.value}
+                                    onChange={this.handleChange}/>
                                 <button>입력</button>
                             </form>
                             <div>
