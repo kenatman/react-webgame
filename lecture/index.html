@@ -7,59 +7,49 @@
     <body>
         <div id="root"></div> <!-- 결과 : <div id="root"><button>Like</button></div> -->
         <script type="text/babel">
-            class GuGuDan extends React.Component {
-                constructor(props) {
-                    super(props);
-                    this.state = {
-                        first: Math.ceil(Math.random()*9),
-                        second: Math.ceil(Math.random()*9),
-                        value: "",
-                        result: "",
-                    }
-                }
+            'use strict';
+            const GuGuDan = () => {
+                const [first, setFirst] = React.useState(Math.ceil(Math.random() * 9));
+                const [second, setSecond] = React.useState(Math.ceil(Math.random() * 9));
+                const [value, setValue] = React.useState("");
+                const [result, setResult] = React.useState("");
+                const inputRef = React.useRef();
 
-                handleSubmit = (e) => {
+                const handleSubmit = (e) => {
                     e.preventDefault();
-                    if(parseInt(this.state.value) === this.state.first * this.state.second){
-                        this.setState((prev) => ({
-                            first: Math.ceil(Math.random() * 9),
-                            second: Math.ceil(Math.random() * 9),
-                            value: "",
-                            result: "정답: " + prev.value,
-                        }));
-                        this.input.focus();
-                    } else{
-                        this.setState({
-                            value: "",
-                            result: "떙!",
-                        })
+                    if (parseInt(value) === first * second) {
+                        setFirst(Math.ceil(Math.random() * 9));
+                        setSecond(Math.ceil(Math.random() * 9));
+                        setValue("");
+                        setResult("정답: " + value)
+
+                    } else {
+                        setValue("");
+                        setResult("땡");
                     }
+                    inputRef.current.focus();
                 }
 
-                handleChange = (e) => {this.setState({value: e.target.value})}
+                const handleChange = (e) => {
+                    setValue(e.target.value);
+                }
 
-                input;
-
-                handleRefInput = (c) => {this.input = c}
-
-                render() {
-                    return (
+                return (
+                    <React.Fragment>
+                        <div>{first} 곱하기 {second}는?</div>
+                        <form onSubmit={handleSubmit}>
+                            <input
+                                ref={inputRef}
+                                type="number"
+                                value={value}
+                                onChange={handleChange}/>
+                            <button>입력</button>
+                        </form>
                         <div>
-                            <div>{this.state.first} 곱하기 {this.state.second}는?</div>
-                            <form onSubmit={this.handleSubmit}>
-                                <input
-                                    ref={this.handleRefInput}
-                                    type="number"
-                                    value={this.state.value}
-                                    onChange={this.handleChange}/>
-                                <button>입력</button>
-                            </form>
-                            <div>
-                                {this.state.result}
-                            </div>
+                            {result}
                         </div>
-                    )
-                }
+                    </React.Fragment>
+                )
             }
         </script>
         <script type="text/babel">
