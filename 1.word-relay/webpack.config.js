@@ -13,6 +13,16 @@ module.exports = {
     }, // 입력
     output: {
         path: path.join(__dirname, 'dist'), // __dirname은 webpack.config.js 파일이 위치한 경로
-        fileName: 'app.js'
+        filename: 'app.js'
     }, // 출력
+    module: {
+        rules: [{
+            test: /\.jsx?/,
+            loader: 'babel-loader',
+            options: {
+                presets: ['@babel/preset-env', '@babel/preset-react'],
+                plugins: ['@babel/plugin-proposal-class-properties'],
+            }
+        }]
+    }
 }

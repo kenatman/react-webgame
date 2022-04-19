@@ -2,16 +2,13 @@ const React = require('react');
 const { Component } = React;
 
 class WordRelay extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        }
+    state = {
+        name: 'hello webpack'
     }
 
     render(){
         return (
-            <div>끝말잇기</div>
+            <div>{this.state.name}</div>
         )
     }
 }
