@@ -1,4 +1,5 @@
 const path = require('path');
+const RefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = {
     name: 'word-relay',
@@ -13,7 +14,8 @@ module.exports = {
     }, // 입력
     output: {
         path: path.join(__dirname, 'dist'), // __dirname은 webpack.config.js 파일이 위치한 경로
-        filename: 'app.js'
+        filename: 'app.js',
+        publicPath: '/dist/' // app.use('/dist', express.static(__dirname, 'dist')) 와 비슷 // publicPath란 webpack-dev-server가 사용하는 결과물간의 상대가상경로라고 생각하면 됨.
     }, // 출력
     module: {
         rules: [{
@@ -29,8 +31,19 @@ module.exports = {
                     }],
                     '@babel/preset-react'
                 ],
-                plugins: ['@babel/plugin-proposal-class-properties'],
+                plugins: [
+                    '@babel/plugin-proposal-class-properties',
+                    'react-refresh/babel'
+                ],
             }
         }]
+    },
+    plugins: [
+        new RefreshWebpackPlugin()
+    ],
+    devServer: {
+        devMiddleware: { publicPath: '/dist/' },
+        static: { directory: path.resolve(__dirname) },
+        hot: true
     }
 }
