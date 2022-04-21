@@ -10,7 +10,7 @@ module.exports = {
     },
 
     entry: {
-        app: ['./client'] // ['./client.jsx', './WordRelay.jsx'] -> client.jsx에서 WordRelay.jsx를 불러오므로 client.jsx만 쓰면 됨.
+        app: ['./client'] // ['./client.jsx', './NumberBaseball.jsx'] -> client.jsx에서 WordRelay.jsx를 불러오므로 client.jsx만 쓰면 됨.
     }, // 입력
     output: {
         path: path.join(__dirname, 'dist'), // __dirname은 webpack.config.js 파일이 위치한 경로

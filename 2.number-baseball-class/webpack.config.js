@@ -43,7 +43,7 @@ module.exports = {
     ],
     devServer: {
         devMiddleware: { publicPath: '/dist/' },
-        static: { directory: path.resolve(__dirname) },
+        static: { directory: path.resolve(__dirname) }, // html위치
         hot: true
     }
 }
