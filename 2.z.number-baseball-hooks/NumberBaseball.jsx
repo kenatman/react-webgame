@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useRef, useState} from 'react';
 
 // 함수안에서 this 안쓰면 class 밖으로 뺴는게 낫다.
 function getNumbers() {
@@ -17,6 +17,7 @@ const NumberBaseball  = () => {
     const [value, setValue] = useState('');
     const [answer, setAnswer] = useState(getNumbers());
     const [tries, setTries] = useState([]);
+    const inputRef = useRef();
 
     const handleChange = (e) => {
         setValue(e.target.value);
@@ -35,6 +36,7 @@ const NumberBaseball  = () => {
             setValue('');
             setAnswer(getNumbers());
             setTries([]);
+            inputRef.current.focus();
         } else { // 답이 틀렸으면
             const answerArray = value.split('').map(v => parseInt(v));
             let strike = 0;
@@ -47,6 +49,7 @@ const NumberBaseball  = () => {
                 setValue('');
                 setAnswer(getNumbers());
                 setTries([]);
+                inputRef.current.focus();
             } else { // 다시 기회를 준다.
                 for (let i = 0; i < 4; i++) {
                     if(answerArray[i] === answer[i]){
@@ -57,6 +60,7 @@ const NumberBaseball  = () => {
                 }
                 setTries((prev) => ([...prev, {try: value, result: `${strike} 스트라이크, ${ball} 볼입니다.`}]));
                 setValue('');
+                inputRef.current.focus();
             }
         }
     }
@@ -65,7 +69,7 @@ const NumberBaseball  = () => {
         <>
             <h1>{result}</h1>
             <form onSubmit={handleSubmit}>
-                <input value={value} onChange={handleChange}/>
+                <input ref={inputRef} value={value} onChange={handleChange}/>
             </form>
             <div>시도: {tries.length}</div>
             <ul>

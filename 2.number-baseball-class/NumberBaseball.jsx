@@ -20,12 +20,19 @@ class NumberBaseball extends Component {
         tries: []
     }
 
+    inputRef;
+
+    handleInputRef = (c) => {
+        // createRef가 있는데 이 형태가 존재하는 이유 : 함수형태니까 추가작업을 할 수 있음.
+        this.inputRef = c
+    }
+
     render(){
         return (
             <>
                 <h1>{this.state.result}</h1>
                 <form onSubmit={this.handleSubmit}>
-                    <input value={this.state.value} onChange={this.handleChange}/>
+                    <input ref={this.handleInputRef} value={this.state.value} onChange={this.handleChange}/>
                 </form>
                 <div>시도: {this.state.tries.length}</div>
                 <ul>
@@ -62,7 +69,8 @@ class NumberBaseball extends Component {
                 value: '',
                 answer: getNumbers(),
                 tries: [],
-            })
+            });
+            this.inputRef.focus();
         } else { // 답이 틀렸으면
             const answerArray = value.split('').map(v => parseInt(v));
             let strike = 0;
@@ -78,7 +86,8 @@ class NumberBaseball extends Component {
                     value: '',
                     answer: getNumbers(),
                     tries: [],
-                })
+                });
+                this.inputRef.focus();
             } else { // 다시 기회를 준다.
                 for (let i = 0; i < 4; i++) {
                     if(answerArray[i] === answer[i]){
@@ -92,7 +101,8 @@ class NumberBaseball extends Component {
                         tries: [...prev.tries, {try: value, result: `${strike} 스트라이크, ${ball} 볼입니다.`}],
                         value: ''
                     }
-                })
+                });
+                this.inputRef.focus();
             }
         }
     }
