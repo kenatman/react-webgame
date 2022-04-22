@@ -51,9 +51,11 @@ class NumberBaseball extends Component {
         e.preventDefault();
         if (value === answer.join('')) {
             // 안좋은 예 : setState를 연달아 쓰는 문제.. 비동기므로 리액트에서 모았다가 처리. alert가 먼저 실행되는 문제.
-            this.setState({
-                result: '홈런!',
-                tries: [...this.state.tries, {try: value, result: '홈런!'}]
+            this.setState((prev) => {
+                return {
+                    result: '홈런!',
+                    tries: [...prev.tries, {try: value, result: '홈런!'}]
+                }
             });
             alert('게임을 다시 시작합니다.')
             this.setState({
@@ -85,13 +87,14 @@ class NumberBaseball extends Component {
                         ball++
                     }
                 }
-                this.setState({
-                    tries: [...this.state.tries, {try: value, result: `${strike} 스트라이크, ${ball} 볼입니다.`}],
-                    value: ''
+                this.setState((prev) => {
+                    return {
+                        tries: [...prev.tries, {try: value, result: `${strike} 스트라이크, ${ball} 볼입니다.`}],
+                        value: ''
+                    }
                 })
             }
         }
-
     }
 }
 
