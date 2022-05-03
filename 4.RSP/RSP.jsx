@@ -26,9 +26,10 @@ class RSP extends Component {
     }
 
     intervalId;
+    clickable = true; // flag 변수 추가
 
     componentDidMount() {
-        this.intervalId = setInterval(this.changeHand, 1000)
+        this.intervalId = setInterval(this.changeHand, 100)
     }
 
     componentWillUnmount() {
@@ -41,9 +42,9 @@ class RSP extends Component {
             <>
                 <div id="computer" style={{ background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0` }} />
                 <div>
-                    <button id="rock" className="btn" onClick={() => this.onClickBtn('바위')}>바위</button>
-                    <button id="scissor" className="btn" onClick={() => this.onClickBtn('가위')}>가위</button>
-                    <button id="paper" className="btn" onClick={() => this.onClickBtn('보')}>보</button>
+                    <button id="rock" className="btn" onClick={this.onClickBtn('바위')}>바위</button> {/*콜백이 아니라 함수호출이 들어간다? -> 고차함수다.*/}
+                    <button id="scissor" className="btn" onClick={this.onClickBtn('가위')}>가위</button>
+                    <button id="paper" className="btn" onClick={this.onClickBtn('보')}>보</button>
                 </div>
                 <div>{result}</div>
                 <div>현재 {score}점</div>
@@ -68,29 +69,35 @@ class RSP extends Component {
         }
     }
 
-    onClickBtn = (choice) => {
-        const { imgCoord } = this.state;
-        clearInterval(this.intervalId);
-        const myScore = scores[choice];
-        const cpuScore = scores[computerChoice(imgCoord)];
-        const diff = myScore - cpuScore;
+    onClickBtn = (choice) => (e) => {
+        if (this.clickable) {
+            this.clickable = false;
+            const { imgCoord } = this.state;
+            clearInterval(this.intervalId);
+            const myScore = scores[choice];
+            const cpuScore = scores[computerChoice(imgCoord)];
+            const diff = myScore - cpuScore;
 
-        if (diff === 0) {
-            this.setState({
-                result: '비겼습니다.'
-            });
-        } else if ([1, -2].includes(diff)) {
-            this.setState((prev) => ({
-                result: '이겼습니다.',
-                score: prev.score + 1
-            }))
-        } else {
-            this.setState((prev) => ({
-                result: '졌습니다.',
-                score: prev.score - 1
-            }))
+            if (diff === 0) {
+                this.setState({
+                    result: '비겼습니다.'
+                });
+            } else if ([1, -2].includes(diff)) {
+                this.setState((prev) => ({
+                    result: '이겼습니다.',
+                    score: prev.score + 1
+                }))
+            } else {
+                this.setState((prev) => ({
+                    result: '졌습니다.',
+                    score: prev.score - 1
+                }))
+            }
+            setTimeout(() => {
+                this.clickable = true;
+                this.intervalId = setInterval(this.changeHand, 100);
+            }, 1000)
         }
-        this.intervalId = setInterval(this.changeHand, 1000)
     }
 }
 
