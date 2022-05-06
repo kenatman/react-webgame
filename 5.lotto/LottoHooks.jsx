@@ -45,6 +45,16 @@ const LottoHooks = () => {
         timeoutIds.current = [];
     }, [winNumbers])
 
+    // 패턴 : componentDidUpdate()만! componentDidMount X
+/*    const mounted = useRef(false);
+    useEffect(() => {
+        if (!mounted.current) {
+            mounted.current = true;
+        } else {
+            // ajax
+        }
+    }, [바뀌는 값])*/
+
     useEffect(() => {
         runTimeout();
         return () => {
