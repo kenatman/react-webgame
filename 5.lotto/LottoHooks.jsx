@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react';
 import Ball from './Ball';
 
 function getWinNumbers() {
+    console.log('getWinNumbers');
     const candidate = Array(45).fill().map((v, i) => (i + 1));
     const shuffle = [];
     while (candidate.length > 0) {
@@ -13,7 +14,8 @@ function getWinNumbers() {
 }
 
 const LottoHooks = () => {
-    const [winNumbers, setWinNumbers] = useState(getWinNumbers());
+    const memoWinNumbers = useMemo(() => getWinNumbers(), []);
+    const [winNumbers, setWinNumbers] = useState(memoWinNumbers);
     const [winBalls, setWinBalls] = useState([]);
     const [bonus, setBonus] = useState(null);
     const [redo, setRedo] = useState(false);
@@ -33,14 +35,15 @@ const LottoHooks = () => {
         }, 7000)
     }
 
-    const onClickRedo = () => {
-        setWinBalls(getWinNumbers());
+    const onClickRedo = useCallback(() => {
+        console.log(winNumbers);
+        setWinNumbers(getWinNumbers());
         setWinBalls([]);
         setBonus(null);
         setRedo(false);
 
         timeoutIds.current = [];
-    }
+    }, [winNumbers])
 
     useEffect(() => {
         runTimeout();
