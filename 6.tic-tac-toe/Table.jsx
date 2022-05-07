@@ -1,10 +1,11 @@
 import React from 'react';
 import Tr from './Tr';
 
-const Table = ({ tableData, onClick }) => {
+const Table = ({ tableData, dispatch }) => {
     return (
-        <table onClick={onClick}>
-            { Array(tableData.length).fill().map((v, i) => <Tr tableRow={tableData[i]}/>) }
+        <table>
+            {Array(tableData.length).fill().map((v, i) => <Tr key={`tr-${i}`} dispatch={dispatch}
+                                                              rowData={tableData[i]} rowIndex={i}/>)}
         </table>
     )
 }

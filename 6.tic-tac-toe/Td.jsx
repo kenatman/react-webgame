@@ -1,8 +1,20 @@
 import React from 'react';
+import {CHANGE_TURN, CLICK_CELL} from "./TicTacToe";
 
-const Td = () => {
+const Td = ({ cellData, rowIndex, cellIndex, dispatch }) => {
+    const handleClickCell = () => {
+        dispatch({
+            type: CLICK_CELL,
+            rowIndex,
+            cellIndex
+        });
+        dispatch({
+            type: CHANGE_TURN
+        })
+    }
+
     return (
-        <td></td>
+        <td onClick={handleClickCell}>{cellData}</td>
     )
 }
 

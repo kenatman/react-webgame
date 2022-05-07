@@ -1,7 +1,9 @@
 import React, {useCallback, useReducer, useState} from 'react';
 import Table from "./Table";
 
-const SET_WINNER = 'SET_WINNER';
+export const SET_WINNER = 'SET_WINNER';
+export const CLICK_CELL = 'CLICK_CELL';
+export const CHANGE_TURN = 'CHANGE_TURN';
 
 const initialState = {
     winner: '',
@@ -16,6 +18,21 @@ const reducer = (state, action) => {
                 ...state,
                 winner: action.winner
             }
+        case CLICK_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.rowIndex] = [...tableData[action.rowIndex]];
+            tableData[action.rowIndex][action.cellIndex] = state.turn;
+            return {
+                ...state,
+                tableData
+            }
+        }
+        case CHANGE_TURN: {
+            return {
+                ...state,
+                turn: state.turn === 'O' ? 'X' : 'O'
+            }
+        }
         default:
             return state;
     }
@@ -28,16 +45,11 @@ const TicTacToe = () => {
     const [turn, setTurn] = useState('O');
     const [tableData, setTableData] = useState([['', '', ''], ['', '', ''], ['', '', '']]);*/
 
-    const handleClick = useCallback(() => {
-        dispatch({
-            type: SET_WINNER,
-            winner: 'X'
-        })
-    });
 
     return (
+        // TODO : dispatch 넘겨주기, 액션 만들기
         <>
-            <Table tableData={state.tableData} onClick={handleClick}/>
+            <Table tableData={state.tableData} dispatch={dispatch} />
             {state.winner && <div>{state.winner}님의 승리!</div>}
         </>
     )
