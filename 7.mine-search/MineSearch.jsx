@@ -71,7 +71,30 @@ const reducer = (state, action) => {
         case OPEN_CELL: {
             const tableData = [...state.tableData];
             tableData[action.row] = [...state.tableData[action.row]];
-            tableData[action.row][action.cell] = CODE.OPENED;
+            let around = [];
+            if (tableData[action.row - 1]) {
+                around = around.concat(
+                    tableData[action.row - 1][action.cell - 1],
+                    tableData[action.row - 1][action.cell],
+                    tableData[action.row - 1][action.cell + 1]
+                );
+            }
+            // [][]일 때, 첫번째 배열이 null, undefined면 에러 발생하지만 두번째배열은 에러 안남. null, undefined 안의 값을 접근 안하기 때문.
+            around = around.concat(
+                tableData[action.row][action.cell - 1],
+                tableData[action.row][action.cell],
+                tableData[action.row][action.cell + 1]
+            );
+            if (tableData[action.row + 1]) {
+                around = around.concat(
+                    tableData[action.row + 1][action.cell - 1],
+                    tableData[action.row + 1][action.cell],
+                    tableData[action.row + 1][action.cell +1],
+                )
+            }
+            const count = around.filter((v) => ([CODE.MINE, CODE.QUESTION_MINE, CODE.FLAG_MINE].includes(v))).length;
+
+            tableData[action.row][action.cell] = count;
             return {
                 ...state,
                 tableData

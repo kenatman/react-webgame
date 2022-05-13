@@ -46,7 +46,7 @@ const getTdText = (code) => {
         case CODE.FLAG_MINE:
             return '!';
         default:
-            return '';
+            return code || '';
     }
 }
 
