@@ -3,27 +3,34 @@ import Table from "./Table";
 import Form from "./Form";
 
 export const CODE = {
-    MINE: -7,
+    MINE: -7, // 닫힌 칸
     NORMAL: -1,
     QUESTION: -2,
     FLAG: -3,
     QUESTION_MINE: -4,
     FLAG_MINE: -5,
-    CLICKED_MINE: -6,
-    OPENED: 0 // 0이상이면 다 opened
+    CLICKED_MINE: -6, // 열린 칸
+    OPENED: 0 // 0 이상이면 다 opened
 }
 
 export const START_GAME = 'START_GAME';
+export const OPEN_CELL = 'OPEN_CELL';
+export const CLICK_MINE = 'CLICK_MINE';
+export const FLAG_CELL = 'FLAG_CELL';
+export const QUESTION_CELL = 'QUESTION_CELL';
+export const NORMALIZE_CELL = 'NORMALIZE_CELL';
 
 export const TableContext = createContext({
     tableData: [],
-    dispatch: () => {}
+    dispatch: () => {},
+    halted: true
 })
 
 const initialState = {
     tableData: [],
     timer: 0,
-    result: ''
+    result: '',
+    halted: true
 };
 
 const plantMine = (row, cell, mine) => {
@@ -57,8 +64,73 @@ const reducer = (state, action) => {
         case START_GAME:
             return {
                 ...state,
-                tableData: plantMine(action.row, action.cell, action.mine)
+                tableData: plantMine(action.row, action.cell, action.mine),
+                halted: false
+            };
+
+        case OPEN_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            tableData[action.row][action.cell] = CODE.OPENED;
+            return {
+                ...state,
+                tableData
+            };
+        }
+
+        case CLICK_MINE: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            tableData[action.row][action.cell] = CODE.CLICKED_MINE;
+            return {
+                ...state,
+                tableData,
+                halted: true
+            };
+        }
+
+        case FLAG_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            if (tableData[action.row][action.cell] === CODE.MINE) {
+                tableData[action.row][action.cell] = CODE.FLAG_MINE;
+            } else {
+                tableData[action.row][action.cell] = CODE.FLAG;
             }
+            return {
+                ...state,
+                tableData
+            };
+        }
+
+        case QUESTION_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            if (tableData[action.row][action.cell] === CODE.FLAG_MINE) {
+                tableData[action.row][action.cell] = CODE.QUESTION_MINE;
+            } else {
+                tableData[action.row][action.cell] = CODE.QUESTION;
+            }
+            return {
+                ...state,
+                tableData
+            };
+        }
+
+        case NORMALIZE_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            if (tableData[action.row][action.cell] === CODE.QUESTION_MINE) {
+                tableData[action.row][action.cell] = CODE.MINE;
+            } else {
+                tableData[action.row][action.cell] = CODE.NORMAL;
+            }
+            return {
+                ...state,
+                tableData
+            };
+        }
+
         default:
             return state;
     }
@@ -69,9 +141,10 @@ const MineSearch = () => {
 
     // contextAPI로 넘겨주는 props 렌더링 최적화를 위해 useMemo를 사용하여 캐싱.
     const value = useMemo(() => ({
-      tableData: state.tableData,
-      dispatch
-    }), [state.tableData])
+        tableData: state.tableData,
+        dispatch,
+        halted: state.halted
+    }), [state.tableData, state.halted])
 
     return (
         <TableContext.Provider value={value}>
