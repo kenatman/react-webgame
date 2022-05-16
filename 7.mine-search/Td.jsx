@@ -3,7 +3,6 @@ import {CLICK_MINE, CODE, FLAG_CELL, NORMALIZE_CELL, OPEN_CELL, QUESTION_CELL, T
 
 
 const getTdStyle = (code) => {
-    console.log('real_td_rendered');
     switch (code) {
         case CODE.MINE:
         case CODE.NORMAL:
@@ -33,6 +32,7 @@ const getTdStyle = (code) => {
 };
 
 const getTdText = (code) => {
+    console.log('get_td_text');
     switch (code) {
         case CODE.NORMAL:
             return '';
@@ -112,15 +112,19 @@ const Td = memo(({ rowIndex, cellIndex }) => {
     }, [tableData[rowIndex][cellIndex], halted]);
     console.log('td_rendered');
     return (
-        useMemo(() => {
-            return (
-                <td style={getTdStyle(tableData[rowIndex][cellIndex])}
-                        onClick={onClickTd}
-                        onContextMenu={onRightClickTd}
-            >
-                {getTdText(tableData[rowIndex][cellIndex])}
-            </td>)
-        }, [tableData[rowIndex][cellIndex]])
+        <RealTd onClickTd={onClickTd} onRightClickTd={onRightClickTd} data={tableData[rowIndex][cellIndex]} />
+    )
+});
+
+const RealTd = memo(({ onClickTd, onRightClickTd, data }) => {
+    console.log('real_td_rendered');
+    return (
+        <td style={getTdStyle(data)}
+            onClick={onClickTd}
+            onContextMenu={onRightClickTd}
+        >
+            {getTdText(data)}
+        </td>
     )
 });
 
