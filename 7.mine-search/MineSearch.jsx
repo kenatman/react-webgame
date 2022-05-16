@@ -1,4 +1,4 @@
-import React, {useReducer, createContext, useMemo} from 'react';
+import React, {useReducer, createContext, useMemo, useEffect} from 'react';
 import Table from "./Table";
 import Form from "./Form";
 
@@ -19,6 +19,7 @@ export const CLICK_MINE = 'CLICK_MINE';
 export const FLAG_CELL = 'FLAG_CELL';
 export const QUESTION_CELL = 'QUESTION_CELL';
 export const NORMALIZE_CELL = 'NORMALIZE_CELL';
+export const INCREMENT_TIMER = 'INCREMENT_TIMER';
 
 export const TableContext = createContext({
     tableData: [],
@@ -28,9 +29,15 @@ export const TableContext = createContext({
 
 const initialState = {
     tableData: [],
+    data: {
+        row: 0,
+        cell: 0,
+        mine: 0
+    },
     timer: 0,
     result: '',
-    halted: true
+    halted: true,
+    openedCount: 0
 };
 
 const plantMine = (row, cell, mine) => {
@@ -65,39 +72,101 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 tableData: plantMine(action.row, action.cell, action.mine),
-                halted: false
+                data: {
+                    row: action.row,
+                    cell: action.cell,
+                    mine: action.mine
+                },
+                halted: false,
+                openedCount: 0,
+                timer: 0
             };
 
         case OPEN_CELL: {
             const tableData = [...state.tableData];
-            tableData[action.row] = [...state.tableData[action.row]];
-            let around = [];
-            if (tableData[action.row - 1]) {
-                around = around.concat(
-                    tableData[action.row - 1][action.cell - 1],
-                    tableData[action.row - 1][action.cell],
-                    tableData[action.row - 1][action.cell + 1]
-                );
-            }
-            // [][]일 때, 첫번째 배열이 null, undefined면 에러 발생하지만 두번째배열은 에러 안남. null, undefined 안의 값을 접근 안하기 때문.
-            around = around.concat(
-                tableData[action.row][action.cell - 1],
-                tableData[action.row][action.cell],
-                tableData[action.row][action.cell + 1]
-            );
-            if (tableData[action.row + 1]) {
-                around = around.concat(
-                    tableData[action.row + 1][action.cell - 1],
-                    tableData[action.row + 1][action.cell],
-                    tableData[action.row + 1][action.cell +1],
-                )
-            }
-            const count = around.filter((v) => ([CODE.MINE, CODE.QUESTION_MINE, CODE.FLAG_MINE].includes(v))).length;
+            tableData.forEach((row, i) => { // 선택한 셀 뿐 아니라 주변 셀들도 불변성 지켜야 하므로 모두 복사
+                tableData[i] = [...row];
+            });
+            const checked = [];
+            let openedCount = 0;
+            const checkAround = (row ,cell) => {
+                // 상하좌우 없는 칸은 안 열기
+                if (row < 0 || row >= tableData.length || cell < 0 || cell >= tableData[0].length ) return;
+                // 열린 칸은 안 열기
+                if ([CODE.OPENED, CODE.FLAG, CODE.FLAG_MINE, CODE.QUESTION, CODE.QUESTION_MINE].includes(tableData[row][cell])) return;
+                // 한 번 연칸은 안 열기
+                if (checked.includes(row + ',' + cell)) return;
+                else {
+                    checked.push(row + ',' + cell);
+                }
 
-            tableData[action.row][action.cell] = count;
+                let around = [];
+                if (tableData[row - 1]) {
+                    around = around.concat(
+                        tableData[row - 1][cell - 1],
+                        tableData[row - 1][cell],
+                        tableData[row - 1][cell + 1]
+                    );
+                }
+                // [][]일 때, 첫번째 배열이 null, undefined면 에러 발생하지만 두번째배열은 에러 안남. null, undefined 안의 값을 접근 안하기 때문.
+                around = around.concat(
+                    tableData[row][cell - 1],
+                    tableData[row][cell],
+                    tableData[row][cell + 1]
+                );
+                if (tableData[row + 1]) {
+                    around = around.concat(
+                        tableData[row + 1][cell - 1],
+                        tableData[row + 1][cell],
+                        tableData[row + 1][cell +1],
+                    )
+                }
+                const count = around.filter((v) => ([CODE.MINE, CODE.QUESTION_MINE, CODE.FLAG_MINE].includes(v))).length;
+                if (count === 0) { // 주변 칸 오픈
+                    if (row > -1) {
+                        const near = [];
+                        if (row - 1 > -1) {
+                            near.push([row - 1, cell - 1]);
+                            near.push([row - 1, cell]);
+                            near.push([row -1, cell + 1]);
+                        }
+                        near.push([row, cell - 1]);
+                        near.push([row, cell + 1]);
+                        if (row + 1 < tableData.length) {
+                            near.push([row + 1, cell -1]);
+                            near.push([row + 1, cell]);
+                            near.push([row + 1, cell + 1]);
+                        }
+                        near.forEach((n) => {
+                            if (tableData[n[0]][n[1]] !== CODE.OPENED) {
+                                checkAround(n[0], n[1]); // 자기 자신을 호출(재귀함수) : 콜스택 초과 안되도록 후처리 잘해야함.
+                            }
+
+                        })
+                    }
+                }
+
+                if (tableData[row][cell] === CODE.NORMAL) {
+                    openedCount++;
+                }
+                tableData[row][cell] = count;
+            };
+
+            checkAround(action.row, action.cell)
+
+            let halted = false;
+            let result = '';
+            if (state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount) { // 승리
+                halted = true;
+                result = `${state.timer}초만에 승리하였습니다.`
+            }
+
             return {
                 ...state,
-                tableData
+                tableData,
+                halted,
+                result,
+                openedCount: state.openedCount + openedCount
             };
         }
 
@@ -154,6 +223,12 @@ const reducer = (state, action) => {
             };
         }
 
+        case INCREMENT_TIMER:
+            return {
+                ...state,
+                timer: state.timer + 1
+            }
+
         default:
             return state;
     }
@@ -168,6 +243,21 @@ const MineSearch = () => {
         dispatch,
         halted: state.halted
     }), [state.tableData, state.halted])
+
+    useEffect(() => {
+            let intervalId;
+            if (!state.halted) {
+                intervalId = setInterval(() => {
+                    dispatch({
+                        type: INCREMENT_TIMER
+                    })
+                }, 1000);
+            }
+            return () => {
+                clearTimeout(intervalId);
+            }
+        }
+        , [state.halted])
 
     return (
         <TableContext.Provider value={value}>
