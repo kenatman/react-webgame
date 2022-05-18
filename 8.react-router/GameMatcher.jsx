@@ -6,6 +6,9 @@ import RSPClass from '../4.RSP/RSP';
 
 class GameMatcher extends Component {
     render() {
+        let urlSearchParams = new URLSearchParams(this.props.location.search.slice(1));
+        console.log(urlSearchParams.get('page'));
+
         const { match: { params: { name } } } = this.props;
         if (name === 'lotto-generator') {
             return <LottoClass />
